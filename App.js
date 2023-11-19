@@ -21,6 +21,7 @@ import ParkScreen from "./Park"
 import ForgotScreen from "./Forgot"
 import UserProvider from './UserProvider';
 import reservationScreen from './reservation'
+import ReservationDetailsScreen from './reservationDetails';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -48,6 +49,7 @@ export default function App() {
         <Stack.Screen name="ReceiptForm" component={ReceiptScreen} />
         <Stack.Screen name="Park" component={ParkScreen} />
         <Stack.Screen name="Forgot" component={ForgotScreen} />
+        <Stack.Screen name="reservationDetails" component={ReservationDetailsScreen} />
         <Stack.Screen name="reservation" component={reservationScreen}/>
       </Stack.Navigator>
       </UserProvider>
