@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 
@@ -9,10 +10,26 @@ export default function App() {
 
   const reserveSlot = (slotNumber) => {
     if (reservedSlots.includes(slotNumber)) {
-      // If the selected slot is already reserved, cancel the reservation
-      setReservedSlots((prevSlots) => prevSlots.filter((slot) => slot !== slotNumber));
-      setSelectedSlot(null);
-      Alert.alert('Reservation Canceled', `Reservation for Slot ${slotNumber} canceled successfully!`);
+      // If the selected slot is already reserved, ask for confirmation before canceling
+      Alert.alert(
+        'Confirmation',
+        `Are you sure you want to cancel the reservation for Slot ${slotNumber}?`,
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'OK',
+            onPress: () => {
+              setReservedSlots((prevSlots) => prevSlots.filter((slot) => slot !== slotNumber));
+              setSelectedSlot(null);
+              Alert.alert('Reservation Canceled', `Reservation for Slot ${slotNumber} canceled successfully!`);
+            },
+          },
+        ],
+        { cancelable: false }
+      );
     } else {
       // Reserve the slot if it's not already reserved
       setSelectedSlot(slotNumber);
@@ -23,7 +40,7 @@ export default function App() {
     if (selectedSlot !== null) {
       setReservedSlots([...reservedSlots, selectedSlot]);
       setSelectedSlot(null);
-      Alert.alert('Reservation Successful', `Slot ${selectedSlot} reserved successfully!`);
+      Alert.alert('Reservation Request Successful', `Slot ${selectedSlot} request pending..`);
     } else {
       Alert.alert('No Slot Selected', 'Please select a slot before reserving.');
     }
@@ -46,7 +63,7 @@ export default function App() {
             ]}
             onPress={() => reserveSlot(slotNumber + 1)}
           >
-            <Text style={styles.slotButtonText}>{`Slot ${slotNumber + 1}\n$${SLOT_PRICE}`}</Text>
+            <Text style={styles.slotButtonText}>{`Slot ${slotNumber + 1}\nPHP${SLOT_PRICE}`}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -59,7 +76,7 @@ export default function App() {
         <Text style={styles.buttonText}>Reserve Slot</Text>
       </TouchableOpacity>
 
-      <Text style={styles.totalAmountText}>Expected Total Amount: ${totalAmount}</Text>
+      <Text style={styles.totalAmountText}>Expected Total Amount: PHP{totalAmount}</Text>
       <Text style={styles.reservedSlotsText}>
        Slot Reservation Requests: {reservedSlots.map((slot) => `Slot ${slot}`).join(', ')}
       </Text>
