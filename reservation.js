@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Import the useNavigation hook
 import Swiper from 'react-native-swiper';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-
+import ReservationDetailsScreen from './reservationDetails';
 
 const SLOT_PRICE = 30;
-const NUM_SLOTS_PER_SET = 10;
 
-const Stack = createStackNavigator();
+export default function ReservationScreen() {
+  const navigation = useNavigation(); // Initialize the useNavigation hook
 
-export default function App() {
   const [reservedSlots, setReservedSlots] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
 
@@ -51,17 +49,41 @@ export default function App() {
   };
 
   const handleReservation = () => {
-    if (selectedSlot !== null) {
-      setReservedSlots([...reservedSlots, selectedSlot]);
-      setSelectedSlot(null);
-      Alert.alert('Reservation Request Successful', `Slot ${selectedSlot} request pending..`, [
-        {
-          text: 'OK',
-          style: 'default',
-        },
-      ]);
+    if (selectedSlot !== null && !reservedSlots.includes(selectedSlot)) {
+      // Show a confirmation alert before making the reservation
+      Alert.alert(
+        'Confirm Reservation',
+        `Are you sure you want to reserve Slot ${selectedSlot}?`,
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'OK',
+            onPress: () => {
+              const updatedReservedSlots = [...reservedSlots, selectedSlot];
+              setReservedSlots(updatedReservedSlots);
+              setSelectedSlot(null);
+  
+              // Show a success alert after making the reservation
+              Alert.alert(
+                'Reservation Successful',
+                `Slot ${selectedSlot} reserved successfully!`,
+                [
+                  {
+                    text: 'OK',
+                    style: 'default',
+                  },
+                ]
+              );
+            },
+          },
+        ],
+        { cancelable: false }
+      );
     } else {
-      Alert.alert('No Slot Selected', 'Please select a slot before reserving.', [
+      Alert.alert('Invalid Reservation', 'Please select a valid slot before reserving.', [
         {
           text: 'OK',
           style: 'default',
@@ -69,6 +91,32 @@ export default function App() {
       ]);
     }
   };
+
+//const handleReservation = () => {
+  //if (selectedSlot !== null && !reservedSlots.includes(selectedSlot)) {
+    //const updatedReservedSlots = [...reservedSlots, selectedSlot];
+   // setReservedSlots(updatedReservedSlots);
+   // setSelectedSlot(null);
+
+   // navigation.navigate('reservationDetails', {
+     // selectedSlot,
+      //reservedSlots: updatedReservedSlots, // Pass the updated array
+    //  totalAmount: updatedReservedSlots.length * SLOT_PRICE,
+   // });
+  //} else {
+    //Alert.alert('Invalid Reservation', 'Please select a valid slot before reserving.', [
+      //{
+      //  text: 'OK',
+      //  style: 'default',
+    //  },
+    //]);
+  //}
+//};
+
+  const cancelReservation = (cancelledSlot) => {
+    setReservedSlots((prevSlots) => prevSlots.filter((slot) => slot !== cancelledSlot));
+  };
+
 
   const totalAmount = reservedSlots.length * SLOT_PRICE;
 
@@ -80,7 +128,7 @@ export default function App() {
           <Text style={styles.title}>Parking Slot Reservation</Text>
           <Text style={styles.zoneTitle}>ZONE 1 </Text>
           <Text style={styles.floorTitle}>A1 </Text>
-
+    
           <View style={styles.slotContainer}>
             {[...Array(15).keys()].map((slotNumber) => (
               <TouchableOpacity
@@ -127,6 +175,7 @@ export default function App() {
           <Text style={styles.reservedSlotsText}>
             Slot Reservation Requests: {reservedSlots.map((slot) => `Slot ${slot}`).join(', ')}
           </Text>
+          
         </View>
       </ScrollView>
 
